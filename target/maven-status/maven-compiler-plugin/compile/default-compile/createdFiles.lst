@@ -1,0 +1,11 @@
+com\mottu\location\controller\LocationController$LocationRequestPayload.class
+com\mottu\location\service\MqttListenerService.class
+com\mottu\location\repository\MotoRepository.class
+com\mottu\location\config\MqttConfig.class
+com\mottu\location\controller\LocationController.class
+com\mottu\location\model\MotoLocation.class
+com\mottu\location\controller\MotoController.class
+com\mottu\location\service\MqttListenerService$LocationPayload.class
+com\mottu\location\MottuLocationApplication.class
+com\mottu\location\model\Moto.class
+com\mottu\location\repository\MotoLocationRepository.class
