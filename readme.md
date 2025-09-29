@@ -41,7 +41,7 @@ Para criar a infraestrutura e fazer o deploy da aplicação no **Azure**, siga e
 az group create --name ChallengeDevOpsMottu --location "eastus2"
 
 # Cria o servidor Azure SQL e o banco de dados
-az sql server create --name servidormottu --resource-group ChallengeDevOpsMottu --location "eastus2" --admin-user devopsadmin --admin-password "28070505Mm@"
+az sql server create --name servidormottu --resource-group ChallengeDevOpsMottu --location "eastus2" --admin-user devopsadmin --admin-password "280705Mm@"
 az sql db create --resource-group ChallengeDevOpsMottu --server servidormottu --name bdmottufiap --edition Basic
 
 # Cria a regra de firewall (substitua pelo seu IP público)
@@ -55,7 +55,7 @@ az webapp create --resource-group ChallengeDevOpsMottu --plan plan-mottu-fiap --
 
 mvn clean package
 
-#eploy:
+#Deploy:
 
 az webapp deploy --resource-group ChallengeDevOpsMottu --name app-mottu-fiap --src-path target/mottu-location-0.0.1-SNAPSHOT.jar
 
