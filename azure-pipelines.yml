@@ -1,7 +1,3 @@
-# Docker
-# Build and push an image to Azure Container Registry
-# https://docs.microsoft.com/azure/devops/pipelines/languages/docker
-
 trigger:
 - main
 
@@ -9,17 +5,22 @@ resources:
 - repo: self
 
 variables:
-  # Container registry service connection established during pipeline creation
+  #--- Variáveis do seu Build (CI) ---
   dockerRegistryServiceConnection: 'd995b5ae-9167-4161-b451-2f875d1acc50'
   imageRepository: 'mottu-java'
   containerRegistry: 'marcelodevops.azurecr.io'
   dockerfilePath: '$(Build.SourcesDirectory)/dockerfile'
   tag: 'latest'
-
-  # Agent VM image name
-  vmImageName: 'ubuntu-latest'
+  
+  #--- Variáveis do seu Deploy (CD) ---
+  azureSubscription: 'ConexaoPortalAzure'
+  appName: 'marcelodevops'
 
 stages:
+#------------------------------------------------
+# ESTÁGIO 1: CI (BUILD)
+# (Isso é o que você já tinha)
+#------------------------------------------------
 - stage: Build
   displayName: Build and push stage
   jobs:
@@ -37,3 +38,24 @@ stages:
         containerRegistry: $(dockerRegistryServiceConnection)
         tags: |
           $(tag)
+
+#------------------------------------------------
+# ESTÁGIO 2: CD (DEPLOY)
+# (Esta é a parte nova que cumpre o requisito do CD)
+#------------------------------------------------
+- stage: Deploy
+  displayName: Deploy to App Service
+  dependsOn: Build # <-- Garante que só rode DEPOIS do Build
+  condition: succeeded() # <-- Garante que só rode se o Build tiver SUCESSO
+  jobs:
+  - job: Deploy
+    displayName: Deploy
+    pool:
+      name: Default # <-- Importante: também usa seu PC como agente
+    steps:
+    - task: AzureWebAppContainer@1
+      displayName: 'Azure Web App for Container Deploy'
+      inputs:
+        azureSubscription: $(azureSubscription)
+        appName: $(appName)
+        imageName: '$(containerRegistry)/$(imageRepository):$(tag)'
