@@ -6,7 +6,7 @@ Toda a infraestrutura está hospedada na **nuvem Microsoft Azure**.
 
 ---
 
-## 👨‍💻 Integrantes
+## 👨‍💻 Integrante
 
 - Marcelo Siqueira Bonfim – RM558254  
 - Antonio Caue Araujo da Silva – RM558891  
