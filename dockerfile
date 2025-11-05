@@ -5,7 +5,7 @@ COPY . .
 RUN mvn clean package -DskipTests
 
 # Estágio de execução
-FROM openjdk:17-jdk-slim
+FROM openjdk:17-slim
 WORKDIR /app
 # Crie um usuário e grupo não-root
 RUN groupadd -r appgroup && useradd -r -g appgroup appuser
