@@ -1,100 +1,84 @@
-# 🚀 Solução de Rastreamento de Frotas para a Mottu
+# 🚀 Solução de Rastreamento de Frotas para a Mottu (Sprint 4: CI/CD)
 
-Este projeto é uma solução de **back-end** para o desafio da **Sprint 3 de DevOps da FIAP**, focada no rastreamento de frotas da **Mottu**.  
-A aplicação é uma **API RESTful** desenvolvida em **Java com Spring Boot**, que gerencia as localizações de motos em tempo real.  
-Toda a infraestrutura está hospedada na **nuvem Microsoft Azure**.
+Este projeto é a evolução do desafio anterior, focado na entrega da **Sprint 4 de DevOps Tools & Cloud Computing** da FIAP.
+
+A solução é uma **API RESTful** desenvolvida em **Java com Spring Boot**, que gerencia as localizações de motos em tempo real.  
+A grande mudança desta sprint é que o **deploy não é mais manual** — ele é **100% automatizado** por meio de uma esteira de **CI/CD no Azure DevOps Pipelines**.
+
+A pipeline compila o código, constrói uma imagem Docker e a publica no **Azure App Service for Containers**.
 
 ---
 
 ## 👨‍💻 Integrantes
 
-- Marcelo Siqueira Bonfim – RM558254  
-- Antonio Caue Araujo da Silva – RM558891  
-- Felipe Gomes Costa Orikasa – RM557435  
+| Nome | RM |
+|------|----|
+| Marcelo Siqueira Bonfim | RM558254 |
+| Antonio Caue | RM558891 |
+| Felipe Gomes Costa Orikasa| RM557435  |
 
 ---
 
 ## 🛠️ Tecnologias Utilizadas
 
 - **Linguagem:** Java 17  
-- **Framework:** Spring Boot  
-- **Banco de Dados:** Azure SQL Database (PaaS)  
-- **Plataforma de Deploy:** Azure App Service (PaaS)  
-- **Ferramentas de Automação:** Azure CLI, Maven  
+- **Framework:** Spring Boot 3.2  
+- **Conteinerização:** Docker  
+- **Orquestração de CI/CD:** Azure DevOps Pipelines (YAML Multi-stage)  
+- **Repositório de Artefatos:** Azure Container Registry (ACR)  
+- **Plataforma de Deploy:** Azure App Service for Containers (PaaS)  
+- **Banco de Dados:** Azure SQL Database (PaaS)
 
 ---
 
-## 🏗️ Arquitetura da Solução
+## 🏗️ Fluxo de CI/CD Automatizado
 
-- Os **dados de localização das motos** são armazenados no **Azure SQL Database**, um serviço de PaaS totalmente integrado à aplicação.  
+A arquitetura desta solução é totalmente focada em automação.  
+O deploy manual da Sprint 3 foi **completamente substituído**.
+
+### 🔹 Gatilho (Push)
+O desenvolvedor faz um **git push** para a branch `main` no GitHub.
+
+### 🔹 Pipeline (Trigger)
+O **Azure DevOps** detecta o push e inicia automaticamente a pipeline `azure-pipelines.yml`.
+
+### 🔹 Estágio 1: CI (Build)
+
+1. A pipeline usa um agente local (**Self-Hosted**) para rodar os jobs.  
+2. O `Dockerfile` é usado para compilar o projeto Java (`mvn clean package`).  
+3. Uma imagem Docker `mottu-java:latest` é construída.  
+4. A imagem é enviada (**push**) para o nosso **Azure Container Registry (marcelodevops.azurecr.io)**.
+
+### 🔹 Estágio 2: CD (Deploy)
+
+1. Assim que o Build termina com sucesso, o estágio de Deploy começa automaticamente (`dependsOn: Build`).  
+2. A pipeline se conecta ao **Azure App Service** (`marcelodevops`) e o instrui a baixar e rodar a nova imagem `:latest` publicada no ACR.  
+3. O App Service inicia o contêiner Java.  
+4. A aplicação **Spring Boot** lê as **Variáveis de Ambiente** (do App Service) para se conectar ao **Azure SQL**, ao **ACR** e ao **MQTT**.
 
 ---
 
-## ⚙️ Instalação e Deploy (Passo a Passo)
+## ⚙️ Como a Automação Funciona
 
-Para criar a infraestrutura e fazer o deploy da aplicação no **Azure**, siga estes passos em um terminal com o **Azure CLI** instalado e autenticado:
+Diferente da Sprint 3, não há mais um passo a passo manual.  
+Toda a infraestrutura já foi criada e o deploy é **100% automatizado pela pipeline**.
 
-### 1️⃣ Criar Recursos no Azure
+- **Build (CI):** qualquer `git push` na branch `main` dispara o stage `Build` no Azure DevOps.  
+- **Deploy (CD):** assim que o `Build` termina com sucesso, o stage `Deploy` é executado automaticamente e atualiza o App Service em produção.
 
-```bash
-# Cria o Grupo de Recursos
-az group create --name ChallengeDevOpsMottu --location "eastus2"
+---
 
-# Cria o servidor Azure SQL e o banco de dados
-az sql server create --name servidormottu --resource-group ChallengeDevOpsMottu --location "eastus2" --admin-user devopsadmin --admin-password "280705Mm@"
-az sql db create --resource-group ChallengeDevOpsMottu --server servidormottu --name bdmottufiap --edition Basic
+## 🌐 Endpoints da API
 
-# Cria a regra de firewall (substitua pelo seu IP público)
-az sql server firewall-rule create --resource-group ChallengeDevOpsMottu --server servidormottu --name AllowMyIP --start-ip-address <SEU-IP-PUBLICO> --end-ip-address <SEU-IP-PUBLICO>
+A aplicação está no ar e pode ser acessada pela seguinte URL base:
 
-# Cria o Plano de Serviço e o App Service
-az appservice plan create --name plan-mottu-fiap --resource-group ChallengeDevOpsMottu --sku F1 --is-linux
-az webapp create --resource-group ChallengeDevOpsMottu --plan plan-mottu-fiap --name app-mottu-fiap --runtime "JAVA|17-java17"
+🔗 **https://marcelodevops.azurewebsites.net**
 
-2️⃣ Compilar e Fazer o Deploy
+---
 
-mvn clean package
+## 📄 Swagger UI (Recomendado)
 
-#Deploy:
+Para testar todos os endpoints de forma interativa:  
+👉 [https://marcelodevops.azurewebsites.net/swagger-ui/index.html](https://marcelodevops.azurewebsites.net/swagger-ui/index.html)
 
-az webapp deploy --resource-group ChallengeDevOpsMottu --name app-mottu-fiap --src-path target/mottu-location-0.0.1-SNAPSHOT.jar
-
-#Exemplos de Endpoints
-http://app-mottu-fiap.azurewebsites.net/
-
-### ➕ Criar uma Moto (POST)
-POST /api/motos
-Content-Type: application/json
-
-{
-  "placa": "ABC1234",
-  "modelo": "Honda CG 160"
-}
-
-### 📍 Criar uma Localização (POST)
-POST /api/locations/moto/placa/ABC1234
-Content-Type: application/json
-
-{
-  "latitude": -23.5505,
-  "longitude": -46.6333
-}
-
-### 📋 Listar Localizações (GET)
-GET /api/locations
-
-### 🔄 Atualizar Localização (PUT)
-PUT /api/locations/{id}
-Content-Type: application/json
-
-{
-  "latitude": -23.5678,
-  "longitude": -46.6543
-}
-
-### ❌ Excluir Localização (DELETE)
-DELETE /api/locations/{id}
-
-az group delete --name ChallengeDevOpsMottu --yes --no-wait
-
-
+### az group delete --name ChallengeDevOpsMottu --yes --no-wait
