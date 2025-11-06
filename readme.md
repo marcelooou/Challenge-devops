@@ -1,4 +1,4 @@
-# 🚀 Solução de Rastreamento de Frotas para a Mottu
+# 🚀 Solução de Rastreamento de Frotas para Mottu
 
 Este projeto é uma solução de **back-end** para o desafio da **Sprint 3 de DevOps da FIAP**, focada no rastreamento de frotas da **Mottu**.  
 A aplicação é uma **API RESTful** desenvolvida em **Java com Spring Boot**, que gerencia as localizações de motos em tempo real.  
