@@ -14,7 +14,7 @@ Toda a infraestrutura está hospedada na **nuvem Microsoft Azure**.
 
 ---
 
-## 🛠️ Tecnologias Utilizada
+## 🛠️ Tecnologias Utilizadas
 
 - **Linguagem:** Java 17  
 - **Framework:** Spring Boot  
