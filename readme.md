@@ -72,7 +72,7 @@ Toda a infraestrutura já foi criada e o deploy é **100% automatizado pela pipe
 
 A aplicação está no ar e pode ser acessada pela seguinte URL base:
 
-🔗 **https://marcelodevops.azurewebsites.net**
+🔗 **marcelodevops.azurewebsites.net/api/motos**
 
 ---
 
